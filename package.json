@@ -1,0 +1,14 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "Frontend Testing Server",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodemon index.js"
+  },
+  "author": "Arman Pagilagan",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.14.0"
+  }
+}

@@ -1,0 +1,106 @@
+<!doctype html>
+<html class="no-js" lang="en" ng-app="testApp">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ngLamesa - Lightweight Angular component to display data in a table</title>
+    <link rel="stylesheet" href="/assets/css/foundation.css" />
+    <script src="/assets/js/angular.js"></script>
+  </head>
+  <body>
+
+    <div class="row">
+
+      <h3>ngLamesa - Lightweight Angular component to display data in a table</h3>
+      <hr />
+
+      <div ng-controller="testController as tc">
+        <lamesa model="tc.users"><h4>Users</h4></lamesa>
+        <hr />
+        <lamesa model="tc.files"><h4>Files</h4></lamesa>
+      </div>
+
+    </div>
+
+    <script src="/assets/js/ng-lamesa.js"></script>
+    <script src="/assets/js/jquery.js"></script>
+    <script src="/assets/js/foundation.js"></script>
+    <script>
+      $(document).foundation();
+    </script>
+    
+    <script>
+
+      var testApp = angular.module('testApp', []);
+
+      // Register ngLamesa component
+      ngLamesa.register(testApp);
+
+      testApp.controller('testController', ['$log', '$http', '$filter', function($log, $http, $filter) {
+
+        // Create a ngLamesa model for users
+        var users = new ngLamesa.model();
+
+        // Define projection - fields to be included in the table
+        var projection = [
+          { field: 'firstName', description: 'First Name' },
+          { field: 'lastName', description: 'Last Name' },
+          { field: 'age', description: 'Age' }
+        ]
+
+        // Set projection
+        users.setProjection(projection);
+
+        // Bind this controller to the ngLamesa component
+        users.bindToController(this, 'users');
+        
+        // Retrieve Data from a test API end-point
+        $http({
+          method: 'GET',
+          url: '/api/users'
+        }).then(
+          function success(response) {
+            $log.log(response);
+
+            // Set Data to the ngLamesa component
+            users.setData(response.data);
+          },
+          function failed(response) {
+            $log.error(response);
+          }
+        );
+
+        // Create a ngLamesa model for files
+        var files = new ngLamesa.model();
+
+        // Define a Filter Function
+        var filterFn = function(val) {
+          return $filter('date')(val, 'medium');
+        };
+
+        // Define test data
+        var testData = [
+          { filename: 'index.html', fileDesc: 'Main document file', fileCreate: '2016-08-02T13:15:45.290Z' },
+          { filename: 'main.css', fileDesc: 'Stylesheet for the Main document', fileCreate: '2016-09-01T10:12:41.030Z' }
+        ]
+
+        // Define projection
+        var projectionFiles = [
+          { field: 'filename', description: 'File Name' },
+          { field: 'fileDesc', description: 'File Description' },
+          { field: 'fileCreate', description: 'File Creation', filter: filterFn }
+        ];
+
+        // Bind this controller to the ngLamesa component
+        files.bindToController(this, 'files');
+
+        // Set Data to the ngLamesa component
+        files.setData(testData, projectionFiles);
+
+      }]);
+
+    </script>
+
+  </body>
+</html>
